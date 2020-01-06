@@ -122,7 +122,9 @@ const App = () => {
         .create(personObject)
         .then(response => {
           setPersons(persons.concat(response))
-          successSateSetter(`Added ${personObject.name}`)
+          successStateSetter(`Added ${personObject.name}`)
+        }).catch( error => {
+          errorStateSetter(error.response.data.error)
         })
       setname('')
       setnumber('')
@@ -135,13 +137,10 @@ const App = () => {
       .update(personObject)
       .then(response => {
         setPersons(persons.map(person => person.id !== personObject.id ? person : personObject))
-        successSateSetter(`Modified ${personObject.name} number to ${personObject.number}`)
+        successStateSetter(`Modified ${personObject.name} number to ${personObject.number}`)
       })
       .catch(error => {
-        setErrorState(<Error text={`Information of ${personObject.name} has already been removed from the server`} />)
-        setTimeout(() => {
-          setErrorState(<></>)
-        }, 5000)
+        errorStateSetter(`Information of ${personObject.name} has already been removed from the server`)
       })
   }
 
@@ -151,18 +150,22 @@ const App = () => {
         .remove(deletedPerson.id)
         .then(response => {
           setPersons(persons.filter(person => person.id !== deletedPerson.id))
-          successSateSetter(`Deleted ${deletedPerson.name}`)
+          successStateSetter(`Deleted ${deletedPerson.name}`)
         })
         .catch(error => {
-          setErrorState(<Error text={`Information of ${deletedPerson.name} has already been removed from the server`} />)
-          setTimeout(() => {
-            setErrorState(<></>)
-          }, 5000)
+          errorStateSetter(`Information of ${deletedPerson.name} has already been removed from the server`)
         })
     }
   }
 
-  const successSateSetter = (message) => {
+  const errorStateSetter = (message) => {
+    setErrorState(<Error text={message} />)
+    setTimeout(() => {
+      setErrorState(<></>)
+    }, 5000)
+  }
+
+  const successStateSetter = (message) => {
     setSuccessState(<Success text={message} />)
     setTimeout(() => {
       setSuccessState(<></>)
